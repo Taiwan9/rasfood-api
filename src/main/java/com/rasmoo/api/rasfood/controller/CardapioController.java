@@ -27,6 +27,11 @@ public class CardapioController {
         return ResponseEntity.status(HttpStatus.OK).body(cardapioRepository.findAll());
     }
 
+    @GetMapping("/categoria/{categoriaId}/disponivel")
+    ResponseEntity<List<Cardapio>> consultaPorCategoriaEDisponibilidade(@PathVariable("categoriaId") final Integer categoriaId){
+        return ResponseEntity.status(HttpStatus.OK).body(cardapioRepository.findAllByCategoria(categoriaId));
+    }
+
     @GetMapping("/{id}")
     ResponseEntity<Cardapio> consultaPorId(@PathVariable("id") final Integer id){
         Optional<Cardapio> cardapioEncontrado = cardapioRepository.findById(id);
