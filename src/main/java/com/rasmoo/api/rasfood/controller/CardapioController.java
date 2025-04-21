@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rasmoo.api.rasfood.dto.CardapioDto;
 import com.rasmoo.api.rasfood.entity.Cardapio;
 import com.rasmoo.api.rasfood.repository.CardapioRepository;
+import com.rasmoo.api.rasfood.repository.projection.CardapioProjection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,7 +35,7 @@ public class CardapioController {
     }
 
     @GetMapping("/categoria/{categoriaId}/disponivel")
-    ResponseEntity<List<Cardapio>> consultaPorCategoriaEDisponibilidade(@PathVariable("categoriaId") final Integer categoriaId){
+    ResponseEntity<List<CardapioProjection>> consultaPorCategoriaEDisponibilidade(@PathVariable("categoriaId") final Integer categoriaId){
         return ResponseEntity.status(HttpStatus.OK).body(cardapioRepository.findAllByCategoria(categoriaId));
     }
 

@@ -2,7 +2,10 @@ package com.rasmoo.api.rasfood.repository;
 
 import com.rasmoo.api.rasfood.dto.CardapioDto;
 import com.rasmoo.api.rasfood.entity.Cardapio;
+import com.rasmoo.api.rasfood.repository.projection.CardapioProjection;
+import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
@@ -16,6 +19,22 @@ public interface CardapioRepository extends JpaRepository<Cardapio, Integer> {
             "AND c.disponivel = true")
     List<CardapioDto> findAllByNome(final String nome);
 
-    @Query(value = "SELECT * FROM cardapio c WHERE c.categoria_id = ?1 AND c.disponivel = true",nativeQuery = true)
-    List<Cardapio> findAllByCategoria(final Integer categoria);
+    @Query(value = " SELECT " +
+            "    c.nome as nome," +
+            "    c.descricao as descricao," +
+            "    c.valor as valor," +
+            "    cat.nome as nomeCategoria" +
+            "    FROM cardapio c" +
+            "    INNER JOIN categorias cat ON c.categoria_id = cat.id" +
+            " WHERE c.categoria_id = ?1 AND c.disponivel = true", nativeQuery = true)
+    List<CardapioProjection> findAllByCategoria(final Integer categoria);
+
+    @Transactional
+    @Modifying
+    @Query("UPDATE Cardapio c SET c.disponivel = " +
+            " CASE c.disponivel " +
+            " WHEN true THEN false " +
+            " ELSE true END " +
+            " WHERE c.id = :id")
+    Integer updateDisponibilidade(final Integer id);
 }
