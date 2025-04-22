@@ -29,6 +29,9 @@ public class Cardapio {
     @OneToMany(fetch = FetchType.LAZY)
     private List<OrdensCardapio> ordensCardapioList;
 
+    @Lob
+    private byte[] img;
+
     public Cardapio(){}
 
     public Cardapio(String nome, String descricao, Boolean disponivel,
@@ -50,6 +53,13 @@ public class Cardapio {
         this.categoria = categoria;
     }
 
+    public byte[] getImg() {
+        return img;
+    }
+
+    public void setImg(byte[] img) {
+        this.img = img;
+    }
 
     public Integer getId() {
         return id;
