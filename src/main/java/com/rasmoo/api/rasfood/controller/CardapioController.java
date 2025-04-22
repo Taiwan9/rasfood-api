@@ -7,11 +7,15 @@ import com.rasmoo.api.rasfood.entity.Cardapio;
 import com.rasmoo.api.rasfood.repository.CardapioRepository;
 import com.rasmoo.api.rasfood.repository.projection.CardapioProjection;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @RequestMapping("/cardapio")
@@ -25,18 +29,27 @@ public class CardapioController {
     private ObjectMapper objectMapper;
 
     @GetMapping
-    ResponseEntity<List<Cardapio>> consultaTodos(){
-        return ResponseEntity.status(HttpStatus.OK).body(cardapioRepository.findAll());
+    ResponseEntity<Page<Cardapio>> consultaTodos(@RequestParam("page") Integer page, @RequestParam("size") Integer size,
+                                                 @RequestParam(value = "sort", required = false) Sort.Direction sort,
+                                                 @RequestParam(value = "property", required = false) String property){
+        Pageable pageable= Objects.nonNull(sort)
+                ?PageRequest.of(page,size, Sort.by(sort, property))
+                :PageRequest.of(page,size);
+        return ResponseEntity.status(HttpStatus.OK).body(cardapioRepository.findAll(pageable));
     }
 
     @GetMapping("/nome/{nome}/disponivel")
-    ResponseEntity<List<CardapioDto>> consultaPorNome(@PathVariable("nome") final String nome){
-        return ResponseEntity.status(HttpStatus.OK).body(cardapioRepository.findAllByNome(nome));
+    ResponseEntity<Page<CardapioDto>> consultaPorNome(@PathVariable("nome") final String nome,
+                                                      @RequestParam("page") Integer page, @RequestParam("size") Integer size){
+        Pageable pageable= PageRequest.of(page,size);
+        return ResponseEntity.status(HttpStatus.OK).body(cardapioRepository.findAllByNome(nome, pageable));
     }
 
     @GetMapping("/categoria/{categoriaId}/disponivel")
-    ResponseEntity<List<CardapioProjection>> consultaPorCategoriaEDisponibilidade(@PathVariable("categoriaId") final Integer categoriaId){
-        return ResponseEntity.status(HttpStatus.OK).body(cardapioRepository.findAllByCategoria(categoriaId));
+    ResponseEntity<Page<CardapioProjection>> consultaPorCategoriaEDisponibilidade(@PathVariable("categoriaId") final Integer categoriaId,
+        @RequestParam("page") Integer page, @RequestParam("size") Integer size){
+        Pageable pageable= PageRequest.of(page,size);
+        return ResponseEntity.status(HttpStatus.OK).body(cardapioRepository.findAllByCategoria(categoriaId, pageable));
     }
 
 
