@@ -6,15 +6,18 @@ import com.rasmoo.api.rasfood.dto.CardapioDto;
 import com.rasmoo.api.rasfood.entity.Cardapio;
 import com.rasmoo.api.rasfood.repository.CardapioRepository;
 import com.rasmoo.api.rasfood.repository.projection.CardapioProjection;
+import com.rasmoo.api.rasfood.repository.specification.CardapioSpec;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -39,10 +42,14 @@ public class CardapioController {
     }
 
     @GetMapping("/nome/{nome}/disponivel")
-    ResponseEntity<Page<CardapioDto>> consultaPorNome(@PathVariable("nome") final String nome,
-                                                      @RequestParam("page") Integer page, @RequestParam("size") Integer size){
+    ResponseEntity<List<Cardapio>> consultaPorNome(@PathVariable("nome") final String nome,
+                                                   @RequestParam("page") Integer page, @RequestParam("size") Integer size){
         Pageable pageable= PageRequest.of(page,size);
-        return ResponseEntity.status(HttpStatus.OK).body(cardapioRepository.findAllByNome(nome, pageable));
+        return ResponseEntity.status(HttpStatus.OK).body(cardapioRepository.findAll(
+                Specification
+                        .where(CardapioSpec.nome(nome)
+                                .and(CardapioSpec.disponivel(true))),
+                pageable).getContent());
     }
 
     @GetMapping("/categoria/{categoriaId}/disponivel")
